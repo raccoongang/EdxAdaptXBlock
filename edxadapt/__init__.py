@@ -1,0 +1,1 @@
+from .edxadapt import EdxAdaptXBlock
