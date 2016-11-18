@@ -7,7 +7,7 @@ function EdxAdaptXBlock(runtime, element) {
     var apiBaseUrl = '{{edx_adapt_api_url}}';
     var courseId = '{{course_id}}';
     var params = {{params}};
-    var skills = ['center', 'shape', 'spread', 'x axis', 'y axis', 'h to d', 'd to h', 'histogram', 'None'];
+    var skills = {{skills}};
 
     var registerUser = function(){
         // Create user
@@ -43,7 +43,6 @@ function EdxAdaptXBlock(runtime, element) {
                 data: JSON.stringify(student_config),
             })
             .done(function(data, textStatus) {
-                console.log("success", data, textStatus);
                 setStatusOk();
             })
             .fail(function() {
