@@ -1,6 +1,8 @@
 import logging
 import pkg_resources
 
+from django.template import Template, Context
+from HTMLParser import HTMLParser
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Dict, Float, String
 from xblock.fragment import Fragment
@@ -9,6 +11,7 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
+html_parser = HTMLParser()
 
 
 class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
@@ -49,14 +52,27 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         """
         Configures user in edx-adapt if it wasn't configured before
         """
-        # html = self.resource_string("static/html/edxadapt.html")
-        # frag = Fragment(html.format(self=self))
-        # frag.add_css(self.resource_string("static/css/edxadapt.css"))
-        # frag.add_javascript(self.resource_string("static/js/src/edxadapt.js"))
-        # frag.initialize_js('EdxAdaptXBlock')
+        html = self.resource_string("static/html/student_view.html")
+        anonymous_student_id = self.runtime.anonymous_student_id
+        frag = Fragment(html.format(
+            self=self,
+            anonymous_student_id=anonymous_student_id,
+            student_is_registered=self.student_is_registered))
+        frag.add_css(self.resource_string("static/css/edxadapt.css"))
+        frag.add_javascript(
+            html_parser.unescape(
+                Template(self.resource_string(
+                    'static/js/src/edxadapt.js'
+                )).render(Context({
+                    'anonymous_student_id': anonymous_student_id,
+                    'course_id': 'CMUSTAT101', # self.course_id.html_id(),
+                    'edx_adapt_api_url': self.edx_adapt_api_url,
+                    'params': self.params,
+                }))
+            )
+        )
+        frag.initialize_js('EdxAdaptXBlock')
 
-        html = u"<div>I'm a student view. Anonymous student id == {}</div>".format(self.xmodule_runtime.anonymous_student_id)
-        frag = Fragment(html)
         return frag
 
     def author_view(self, context=None):

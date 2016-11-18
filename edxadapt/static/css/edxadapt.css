@@ -1,0 +1,6 @@
+/* CSS for EdxAdaptXBlock */
+
+#status_ok, #status_nok {
+    visibility: hidden;
+}
+
