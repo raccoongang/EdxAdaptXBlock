@@ -4,7 +4,7 @@ import pkg_resources
 from django.template import Template, Context
 from HTMLParser import HTMLParser
 from xblock.core import XBlock
-from xblock.fields import Scope, Boolean, Dict, Float, List, String
+from xblock.fields import Scope, Boolean, Dict, List, String
 from xblock.fragment import Fragment
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -72,7 +72,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
                 )).render(Context({
                     'anonymous_student_id': anonymous_student_id,
                     'course_id': self.course_id.html_id(),
-                    'edx_adapt_api_url': self.edx_adapt_api_url,
+                    'edx_adapt_api_url': self.edx_adapt_api_url.rstrip('/'),
                     'params': self.params,
                     'skills': self.skills,
                 }))

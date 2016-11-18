@@ -66,7 +66,7 @@ function EdxAdaptXBlock(runtime, element) {
             if (jqXHR.status == 404) {
                 registerUser();
             }
-            console.log("error", jqXHR, textStatus);
+            console.log("error", jqXHR.responseText);
         });
     }
     var setStatusOk = function() {
