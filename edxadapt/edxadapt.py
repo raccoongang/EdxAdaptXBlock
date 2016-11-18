@@ -2,7 +2,7 @@ import logging
 import pkg_resources
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Dict, Float, String
+from xblock.fields import Scope, Boolean, Dict, Float, String
 from xblock.fragment import Fragment
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -33,6 +33,10 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         default='',
         scope=Scope.content,
         help="Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1")
+    student_is_registered = Boolean(
+        default=False,
+        scope=Scope.preferences
+    )
 
     editable_fields = ('display_name', 'params', 'edx_adapt_api_url')
 
@@ -56,6 +60,9 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         return frag
 
     def author_view(self, context=None):
-        html = u"<div>I'm an author view. Anonymous student id == {}</div>".format(self.xmodule_runtime.anonymous_student_id)
+        html = self.resource_string('static/html/author_view.html').format(
+            edx_adapt_api_url=self.edx_adapt_api_url,
+            params=self.params
+        )
         frag = Fragment(html)
         return frag
