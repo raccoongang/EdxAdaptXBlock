@@ -1,19 +1,23 @@
 import logging
 import pkg_resources
 
+from django.template import Template, Context
+from HTMLParser import HTMLParser
 from xblock.core import XBlock
-from xblock.fields import Scope, Dict, Float, String
+from xblock.fields import Scope, Boolean, Dict, List, String
 from xblock.fragment import Fragment
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
+html_parser = HTMLParser()
 
 
 class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
     """
-    TO-DO: document what your XBlock does.
+    This XBlock automatically registers students in the EdxAdapt instance
+    using parameters configured by the teaching staff: params, skills, edx_adapt_api_url
     """
 
     has_author_view = True
@@ -21,7 +25,9 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
     display_name = String(
         default='Adaptive Learning',
         display_name=_('Component Display Name'),
-        help=_('The name students see. This name appears in the course ribbon and as a header for the video.'),
+        help=_(
+            'The name students see. This name appears in the course ribbon '
+            'and as a header for the video.'),
         scope=Scope.content,
     )
 
@@ -29,12 +35,29 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         default={'pg': 0.25, 'ps': 0.25, 'pi': 0.1, 'pt': 0.5, 'threshold': 0.99},
         scope=Scope.content)
 
+    skills = List(
+        default=[
+            'center', 'shape', 'spread', 'x axis', 'y axis', 'h to d',
+            'd to h', 'histogram', 'None'
+        ],
+        scope=Scope.content,
+        help=_(
+            'List of skills of this course. Each problem addresses certain skill. '
+            'Special skill "None" is used for those problems which belong to none.'
+        )
+    )
     edx_adapt_api_url = String(
         default='',
         scope=Scope.content,
-        help="Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1")
+        help=_('Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1')
+    )
 
-    editable_fields = ('display_name', 'params', 'edx_adapt_api_url')
+    student_is_registered = Boolean(
+        default=False,
+        scope=Scope.preferences
+    )
+
+    editable_fields = ('display_name', 'params', 'skills', 'edx_adapt_api_url')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -45,17 +68,41 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         """
         Configures user in edx-adapt if it wasn't configured before
         """
-        # html = self.resource_string("static/html/edxadapt.html")
-        # frag = Fragment(html.format(self=self))
-        # frag.add_css(self.resource_string("static/css/edxadapt.css"))
-        # frag.add_javascript(self.resource_string("static/js/src/edxadapt.js"))
-        # frag.initialize_js('EdxAdaptXBlock')
+        html = self.resource_string("static/html/student_view.html")
+        anonymous_student_id = self.runtime.anonymous_student_id
+        frag = Fragment(html.format(
+            self=self,
+            anonymous_student_id=anonymous_student_id,
+            student_is_registered=self.student_is_registered
+        ))
+        frag.add_css(self.resource_string("static/css/edxadapt.css"))
+        frag.add_javascript(
+            html_parser.unescape(
+                Template(self.resource_string(
+                    'static/js/src/edxadapt.js'
+                )).render(Context({
+                    'anonymous_student_id': anonymous_student_id,
+                    'course_id': self.course_id.html_id(),
+                    'edx_adapt_api_url': self.edx_adapt_api_url.rstrip('/'),
+                    'params': self.params,
+                    'skills': self.skills,
+                }))
+            )
+        )
+        frag.initialize_js('EdxAdaptXBlock')
 
-        html = u"<div>I'm a student view. Anonymous student id == {}</div>".format(self.xmodule_runtime.anonymous_student_id)
-        frag = Fragment(html)
         return frag
 
     def author_view(self, context=None):
-        html = u"<div>I'm an author view. Anonymous student id == {}</div>".format(self.xmodule_runtime.anonymous_student_id)
+        """
+        Separate view for Open edX Studio.
+        It displays current xblock settings instead of trying
+        to register user in the EdxAdapt
+        """
+        html = self.resource_string('static/html/author_view.html').format(
+            edx_adapt_api_url=self.edx_adapt_api_url,
+            params=self.params,
+            skills=self.skills
+        )
         frag = Fragment(html)
         return frag
