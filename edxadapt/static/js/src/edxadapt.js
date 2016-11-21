@@ -1,8 +1,6 @@
 /* Javascript for EdxAdaptXBlock. */
 function EdxAdaptXBlock(runtime, element) {
 
-    var handlerUrl = runtime.handlerUrl(element, 'increment_count');
-
     var studentId = '{{anonymous_student_id}}';
     var apiBaseUrl = '{{edx_adapt_api_url}}';
     var courseId = '{{course_id}}';
