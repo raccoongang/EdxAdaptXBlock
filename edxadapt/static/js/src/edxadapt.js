@@ -52,7 +52,8 @@ function EdxAdaptXBlock(runtime, element) {
         })
     };
 
-    var getOrCreateAndConfigureUser = function() {
+    var registerUserInEdxAdapt = function() {
+        // Check if student already registered in EdxAdapt
         $.ajax({
             url: apiBaseUrl + '/course/' + courseId + '/user/' + studentId,
             type: 'GET',
@@ -60,13 +61,14 @@ function EdxAdaptXBlock(runtime, element) {
         })
         .done(function(data, textStatus) {
             console.log("success", data, textStatus);
-            configureUser();
+            // conokfigureUser();
         })
         .fail(function(jqXHR, textStatus) {
             if (jqXHR.status == 404) {
+                // Student not found in EdxAdapt. Let's register them
                 registerUser();
             }
-            console.log("error", jqXHR.responseText);
+            console.log("Failed to register student in EdxAdapt", jqXHR.responseText);
         });
     }
     var setStatusOk = function() {
@@ -76,6 +78,6 @@ function EdxAdaptXBlock(runtime, element) {
         $('#status_nok').css('visibility', 'visible');
     }
     $(function ($) {
-        getOrCreateAndConfigureUser();
+        registerUserInEdxAdapt();
     });
 }
