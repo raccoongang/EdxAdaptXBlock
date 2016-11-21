@@ -35,13 +35,14 @@ function EdxAdaptXBlock(runtime, element) {
                 'skill_name': skill
             };
             $.ajax({
-                url: apiBaseUrl + '/course/' + courseId + '/user/' + studentId,
-                type: 'GET',
+                url: apiBaseUrl + '/parameters',
+                type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(student_config),
             })
-            .done(function(data, textStatus) {
-                setStatusOk();
+            .done(function() {
+                console.log("User Configured");
+                setStatusOk()
             })
             .fail(function() {
                 console.log('Failed to configure skill "'+skill+'" for user "'+studentId+'"');
@@ -59,7 +60,7 @@ function EdxAdaptXBlock(runtime, element) {
         })
         .done(function(data, textStatus) {
             console.log("success", data, textStatus);
-            // conokfigureUser();
+            setStatusNok();
         })
         .fail(function(jqXHR, textStatus) {
             if (jqXHR.status == 404) {
