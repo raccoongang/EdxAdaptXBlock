@@ -8,6 +8,8 @@ from xblock.fields import Scope, Boolean, Dict, List, String
 from xblock.fragment import Fragment
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
+from student.models import anonymous_id_for_user, User
+
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
@@ -64,12 +66,30 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def get_anonymous_student_id(self):
+        """
+        Returns course non-specific anonymous student id compatible with
+        anonymous id used by Capa Problems.
+        """
+
+        return anonymous_id_for_user(
+            User.objects.get(
+                id=self.runtime.user_id), None
+        )
+
+    def get_course_id(self):
+        """
+        Returns short course id compatible with course ids used by
+        Open edX <=> edx adapt communication javascript.
+        """
+        return self.course_id.course
+
     def student_view(self, context=None):
         """
         Configures user in edx-adapt if it wasn't configured before
         """
         html = self.resource_string("static/html/student_view.html")
-        anonymous_student_id = self.runtime.anonymous_student_id
+        anonymous_student_id = self.get_anonymous_student_id()
         frag = Fragment(html.format(
             self=self,
             anonymous_student_id=anonymous_student_id,
@@ -82,7 +102,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
                     'static/js/src/edxadapt.js'
                 )).render(Context({
                     'anonymous_student_id': anonymous_student_id,
-                    'course_id': self.course_id.html_id(),
+                    'course_id': self.get_course_id(),
                     'edx_adapt_api_url': self.edx_adapt_api_url.rstrip('/'),
                     'params': self.params,
                     'skills': self.skills,
