@@ -26,22 +26,22 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
 
     display_name = String(
         default='Adaptive Learning',
-        display_name=_('Component Display Name'),
-        help=_(
-            'The name students see. This name appears in the course ribbon '
-            'and as a header for the video.'),
         scope=Scope.content,
     )
 
     params = Dict(
         default={'pg': 0.25, 'ps': 0.25, 'pi': 0.1, 'pt': 0.5, 'threshold': 0.99},
-        scope=Scope.content)
+        display_name=_('BKT params'),
+        help=_('Barameters for Bayesian Knowledge Tracing (BKT) model'),
+        scope=Scope.content
+    )
 
     skills = List(
         default=[
             'center', 'shape', 'spread', 'x axis', 'y axis', 'h to d',
             'd to h', 'histogram', 'None'
         ],
+        display_name=_('Course skills list'),
         scope=Scope.content,
         help=_(
             'List of skills of this course. Each problem addresses certain skill. '
@@ -50,6 +50,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
     )
     edx_adapt_api_url = String(
         default='',
+        display_name=_('Edx Adapt API base URL'),
         scope=Scope.content,
         help=_('Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1')
     )
@@ -59,7 +60,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.preferences
     )
 
-    editable_fields = ('display_name', 'params', 'skills', 'edx_adapt_api_url')
+    editable_fields = ('params', 'skills', 'edx_adapt_api_url')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""

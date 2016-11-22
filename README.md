@@ -14,8 +14,7 @@ This XBlock does two things.
 
 ## Teacher configuration fields
 
-- **Component Display Name**: the name student see as a Head for the Unit
-- **Params**: parameters for Bayesian Knowledge Tracing (BKT) model default one is:
+- **BKT params**: parameters for Bayesian Knowledge Tracing (BKT) model default one is:
 `{"pi": 0.1, "pt": 0.5, "pg": 0.25, "ps": 0.25, "threshold": 0.99}`
   * *pi* - initial probability student knows the skill
   * *pt* - probability the student learns the skill if they didn’t know it already
@@ -23,7 +22,7 @@ This XBlock does two things.
   * *ps* - probability student makes a mistake even if they does know the skill
   * *threshold* - value which should be reached to make skill be set as learned
 
-- **skills**: course's skills related to every certain problem, default problems list is `["center", "shape", "spread", "x axis", "y axis", "h to d", "d to h", "histogram", "None"]`
+- **Course skills list**: course's skills related to every certain problem, default problems list is `["center", "shape", "spread", "x axis", "y axis", "h to d", "d to h", "histogram", "None"]`
 - **Edx Adapt API base URL**: Base URL for Edx Adapt API you're going to work with, e.g. `https://edx-adapt.example.com:443/api/v1`. Ask your Edx Adapt provider for details.
 
 ## Student registration flow
