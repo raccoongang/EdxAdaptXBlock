@@ -60,7 +60,7 @@ function EdxAdaptXBlock(runtime, element) {
         })
         .done(function(data, textStatus) {
             console.log("success", data, textStatus);
-            setStatusNok();
+            setStatusOk();
         })
         .fail(function(jqXHR, textStatus) {
             if (jqXHR.status == 404) {

@@ -66,6 +66,14 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def ugettext(self, text):
+        """
+        For backward compatibility with older version of XBlock module released before Mar 22, 2016
+
+        See https://github.com/edx/XBlock/blame/ab636a82bc23c3f65a618e438637d518b209790f/xblock/core.py#L204
+        """
+        return text
+
     def get_anonymous_student_id(self):
         """
         Returns course non-specific anonymous student id compatible with
