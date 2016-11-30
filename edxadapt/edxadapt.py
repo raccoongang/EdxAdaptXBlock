@@ -60,18 +60,27 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.preferences
     )
 
+    success_registration_msg = String(
+        default=_(
+            "Your adaptive learning session is configured now. Please click Next button to start solve problems."
+        ),
+        display_name=_("Successful EdxAdapt registration message"),
+        help=_("Message displayed to student after successful registration in EdxAdapt."),
+        scope=Scope.content,
+    )
+
     fail_registration_msg = String(
         default=_(
             "There was a technical issue while we were configuring your adaptive learning session. Please try to "
             "refresh this page or contact technical staff if problem persists."
         ),
-        display_name=_("Assistance message if enrollment fails"),
+        display_name=_("Failed EdxAdapt registration message"),
         help=_("Assistance message with steps student can do to improve Edx Adapt enrollment, e.g. email could be "
                "added for asking for technical support."),
         scope=Scope.content,
     )
 
-    editable_fields = ('params', 'skills', 'edx_adapt_api_url', 'fail_registration_msg')
+    editable_fields = ('params', 'skills', 'edx_adapt_api_url', 'success_registration_msg', 'fail_registration_msg')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -118,6 +127,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
             edx_adapt_api_url=self.edx_adapt_api_url.rstrip('/'),
             params=self.params,
             skills=self.skills,
+            success_registration_msg=self.success_registration_msg,
             fail_registration_msg=self.fail_registration_msg,
         ))
         frag.add_css(self.resource_string("static/css/edxadapt.css"))
@@ -136,7 +146,6 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
             edx_adapt_api_url=self.edx_adapt_api_url,
             params=self.params,
             skills=self.skills,
-            fail_registration_msg=self.fail_registration_msg,
         )
         frag = Fragment(html)
         return frag
