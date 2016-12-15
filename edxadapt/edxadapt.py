@@ -25,14 +25,14 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
     has_author_view = True
 
     display_name = String(
-        default='Adaptive Learning',
+        default='Adaptive Learning Enrollment',
         scope=Scope.content,
     )
 
     params = Dict(
         default={'pg': 0.25, 'ps': 0.25, 'pi': 0.1, 'pt': 0.5, 'threshold': 0.99},
         display_name=_('BKT params'),
-        help=_('Barameters for Bayesian Knowledge Tracing (BKT) model'),
+        help=_('Parameters for Bayesian Knowledge Tracing (BKT) model'),
         scope=Scope.content
     )
 
@@ -102,22 +102,14 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         frag = Fragment(html.format(
             self=self,
             anonymous_student_id=anonymous_student_id,
-            student_is_registered=self.student_is_registered
+            student_is_registered=self.student_is_registered,
+            course_id=self.get_course_id(),
+            edx_adapt_api_url=self.edx_adapt_api_url.rstrip('/'),
+            params=self.params,
+            skills=self.skills
         ))
         frag.add_css(self.resource_string("static/css/edxadapt.css"))
-        frag.add_javascript(
-            html_parser.unescape(
-                Template(self.resource_string(
-                    'static/js/src/edxadapt.js'
-                )).render(Context({
-                    'anonymous_student_id': anonymous_student_id,
-                    'course_id': self.get_course_id(),
-                    'edx_adapt_api_url': self.edx_adapt_api_url.rstrip('/'),
-                    'params': self.params,
-                    'skills': self.skills,
-                }))
-            )
-        )
+        frag.add_javascript(self.resource_string('static/js/src/edxadapt.js'))
         frag.initialize_js('EdxAdaptXBlock')
 
         return frag

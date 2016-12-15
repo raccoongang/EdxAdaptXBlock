@@ -1,10 +1,18 @@
-<div style="display: none;">
+<div
+    id="edx-adapt-options"
+    data-student-id="{anonymous_student_id}"
+    data-api-base-url="{edx_adapt_api_url}"
+    data-course-id="{course_id}"
+    data-params="{params}"
+    data-skills="{skills}"
+    style="display: none;">
 Anonymous student  Id = {anonymous_student_id}
 </div>
 
 <div id="status_ok">
-    <i class="fa fa-check-circle" aria-hidden="true" style="color:green;"></i>
+    <i class="fa fa-check-circle green" aria-hidden="true"></i>
 </div>
+    <i class="fa fa-exclamation-circle red" aria-hidden="true"></i> There was a technical issue while we were configuring your adaptive learning session. Please try to refresh this page or contact technical staff if problem persists.
 <div id="status_nok">
-    <i class="fa fa-exclamation-circle" aria-hidden="true" style="color:red;"></i> There was a technical issue while we were configuring your adaptive learning session. Please try to refresh this page or contact technical staff if problem persists.
+   
 </div>

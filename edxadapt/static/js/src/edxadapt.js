@@ -1,12 +1,13 @@
 /* Javascript for EdxAdaptXBlock. */
 function EdxAdaptXBlock(runtime, element) {
 
-    var studentId = '{{anonymous_student_id}}';
-    var apiBaseUrl = '{{edx_adapt_api_url}}';
-    var courseId = '{{course_id}}';
-    var params = {{params}};
-    var skills = {{skills}};
-
+    var options = $('#edx-adapt-options');
+    var studentId = options.data('student-id');
+    var apiBaseUrl = options.data('api-base-url');
+    var courseId = options.data('course-id');
+    var params = options.data('params');
+    var skills = options.data('skills');
+        
     var registerUser = function(){
         // Create user
         $.ajax({
@@ -22,10 +23,10 @@ function EdxAdaptXBlock(runtime, element) {
         .fail(function() {
             console.log("Failed to create user");
             setStatusNok();
-        })
+        });
     };
 
-    var configureUser = function() {
+    function configureUser() {
         // Configure skill for the user
         skills.forEach(function(skill) {
             var student_config = {
@@ -42,16 +43,16 @@ function EdxAdaptXBlock(runtime, element) {
             })
             .done(function() {
                 console.log("User Configured");
-                setStatusOk()
+                setStatusOk();
             })
             .fail(function() {
                 console.log('Failed to configure skill "'+skill+'" for user "'+studentId+'"');
                 setStatusNok();
             });
-        })
+        });
     };
 
-    var registerUserInEdxAdapt = function() {
+    function registerUserInEdxAdapt() {
         // Check if student already registered in EdxAdapt
         $.ajax({
             url: apiBaseUrl + '/course/' + courseId + '/user/' + studentId,
@@ -70,10 +71,10 @@ function EdxAdaptXBlock(runtime, element) {
             console.log("Failed to register student in EdxAdapt", jqXHR.responseText);
         });
     }
-    var setStatusOk = function() {
+    function setStatusOk() { 
         $('#status_ok').css('visibility', 'visible');
     }
-    var setStatusNok = function() {
+    function setStatusNok() { 
         $('#status_nok').css('visibility', 'visible');
     }
     $(function ($) {
