@@ -30,13 +30,11 @@ This XBlock does two things.
 `https://edx-adapt.example.com:443/api/v1`. Ask your Edx Adapt provider for details.
 
 - **Edx Adapt Course ID**: Optional parameter which is required only in the case adaptive problems is spread between 
-several course's section. By default Course ID is taken from the Edx e.g. 
-`course-v1:<University>+<Course_name>+<course_run>`. E.g. `course-v1:Stanford+PS01+2017`. In case when 
-adaptive problems are spread between several course's section, Course ID should be set manually with adding section name 
-where problems are placed, e.g. `<University>+<Course_name>+<course_run>:<section_name>`, by the way 'course-v1' could 
-be dropped to decrease length of the Course ID. E.g. `Stanford+PS01+2017:introduction`.
-![Editable fields in the XBlock top](doc/img/editable_fields_top_side.png)
-![Editable fields in the XBlock bottom](doc/img/editable_fields_bottom_side.png)
+several course's section. By default Course ID is taken from the Edx e.g. `<University>+<Course_name>+<course_run>`.
+E.g. `Stanford+PS01+2017`. In case when adaptive problems are spread between several course's section, Course ID should 
+be set manually with adding section name where problems are placed, e.g. 
+`<University>+<Course_name>+<course_run>:<section_name>`. E.g. `Stanford+PS01+2017:introduction`.
+![Editable fields in the XBlock top](doc/img/editable_fields.png)
 
 ## Student registration flow
 
