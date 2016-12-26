@@ -7,7 +7,7 @@ function EdxAdaptXBlock(runtime, element) {
     var courseId = options.data('course-id');
     var params = options.data('params');
     var skills = options.data('skills');
-        
+
     var registerUser = function(){
         // Create user
         $.ajax({
@@ -18,7 +18,7 @@ function EdxAdaptXBlock(runtime, element) {
         })
         .done(function() {
             console.log("User Created");
-            configureUser();
+            setStatusOk();
         })
         .fail(function() {
             console.log("Failed to create user");
@@ -28,6 +28,7 @@ function EdxAdaptXBlock(runtime, element) {
 
     function configureUser() {
         // Configure skill for the user
+        var req_list = [];
         skills.forEach(function(skill) {
             var student_config = {
                 'course_id': courseId,
@@ -35,21 +36,23 @@ function EdxAdaptXBlock(runtime, element) {
                 'user_id': studentId,
                 'skill_name': skill
             };
-            $.ajax({
-                url: apiBaseUrl + '/parameters',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(student_config),
-            })
-            .done(function() {
-                console.log("User Configured");
-                setStatusOk();
-            })
-            .fail(function() {
-                console.log('Failed to configure skill "'+skill+'" for user "'+studentId+'"');
-                setStatusNok();
-            });
+            req_list.push(
+                $.ajax({
+                    url: apiBaseUrl + '/parameters',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(student_config),
+                })
+                .done(function() {
+                    console.log("Skill " + skill + "is  configured");
+                })
+                .fail(function() {
+                    console.log('Failed to configure skill "'+skill+'" for user "'+studentId+'"');
+                    setStatusNok();
+                });
+            )
         });
+        return req_list;
     };
 
     function registerUserInEdxAdapt() {
@@ -66,15 +69,15 @@ function EdxAdaptXBlock(runtime, element) {
         .fail(function(jqXHR, textStatus) {
             if (jqXHR.status == 404) {
                 // Student not found in EdxAdapt. Let's register them
-                registerUser();
+                $.when.apply($, configureUser()).then(registerUser());
             }
             console.log("Failed to register student in EdxAdapt", jqXHR.responseText);
         });
     }
-    function setStatusOk() { 
+    function setStatusOk() {
         $('#status_ok').css('visibility', 'visible');
     }
-    function setStatusNok() { 
+    function setStatusNok() {
         $('#status_nok').css('visibility', 'visible');
     }
     $(function ($) {

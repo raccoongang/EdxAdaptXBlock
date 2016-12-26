@@ -1,3 +1,4 @@
+import json
 import logging
 import pkg_resources
 
@@ -55,6 +56,18 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         help=_('Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1')
     )
 
+    edx_adapt_course_id = String(
+        default='',
+        display_name=_('Edx Adapt Course ID'),
+        scope=Scope.content,
+        help=_(
+            "By default Course ID is taken from the Edx e.g. University+Course_name+course_run. E.g. "
+            "Stanford+PS01+2017. In case when adaptive problems are spread between several course's section, Course ID "
+            "should be set manually with adding section name where problems are placed, e.g. "
+            "University+Course_name+course_run:section_name. E.g. Stanford+PS01+2017:introduction"
+        )
+    )
+
     student_is_registered = Boolean(
         default=False,
         scope=Scope.preferences
@@ -80,7 +93,14 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.content,
     )
 
-    editable_fields = ('params', 'skills', 'edx_adapt_api_url', 'success_registration_msg', 'fail_registration_msg')
+    editable_fields = (
+        'params',
+        'skills',
+        'edx_adapt_api_url',
+        'success_registration_msg',
+        'fail_registration_msg',
+        'edx_adapt_course_id'
+    )
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -111,7 +131,9 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         Returns short course id compatible with course ids used by
         Open edX <=> edx adapt communication javascript.
         """
-        return self.course_id.course
+        # NOTE(idegtiarov) drop meaningless part of default course_id to decrease length of id which is stored in
+        # the database
+        return self.course_id.course.replace('course-v1:', '')
 
     def student_view(self, context=None):
         """
@@ -119,14 +141,13 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         """
         html = self.resource_string("static/html/student_view.html")
         anonymous_student_id = self.get_anonymous_student_id()
+        course_id = self.edx_adapt_course_id if self.edx_adapt_course_id else self.get_course_id()
         frag = Fragment(html.format(
-            self=self,
             anonymous_student_id=anonymous_student_id,
-            student_is_registered=self.student_is_registered,
-            course_id=self.get_course_id(),
+            course_id=course_id,
             edx_adapt_api_url=self.edx_adapt_api_url.rstrip('/'),
-            params=self.params,
-            skills=self.skills,
+            params=json.dumps(self.params),
+            skills=json.dumps(self.skills),
             success_registration_msg=self.success_registration_msg,
             fail_registration_msg=self.fail_registration_msg,
         ))
