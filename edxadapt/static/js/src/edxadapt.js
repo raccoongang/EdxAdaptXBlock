@@ -28,31 +28,25 @@ function EdxAdaptXBlock(runtime, element) {
 
     function configureUser() {
         // Configure skill for the user
-        var req_list = [];
-        skills.forEach(function(skill) {
-            var student_config = {
-                'course_id': courseId,
-                'params': params,
-                'user_id': studentId,
-                'skill_name': skill
-            };
-            req_list.push(
-                $.ajax({
-                    url: apiBaseUrl + '/parameters',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(student_config),
-                })
-                .done(function() {
-                    console.log("Skill " + skill + "is  configured");
-                })
-                .fail(function() {
-                    console.log('Failed to configure skill "'+skill+'" for user "'+studentId+'"');
-                    setStatusNok();
-                });
-            )
+        var studentConfig = {
+            'course_id': courseId,
+            'params': params,
+            'user_id': studentId,
+            'skills_list': skills
+        };
+        return $.ajax({
+            url: apiBaseUrl + '/parameters/bulk',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(studentConfig),
+        })
+        .done(function() {
+            console.log("Skills: " + skills + " is  configured");
+        })
+        .fail(function() {
+            console.log('Failed to configure skills: "'+skills+'" for user "'+studentId+'"');
+            setStatusNok();
         });
-        return req_list;
     };
 
     function registerUserInEdxAdapt() {
