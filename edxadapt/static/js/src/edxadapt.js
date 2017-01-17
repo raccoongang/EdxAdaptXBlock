@@ -8,8 +8,8 @@ function EdxAdaptXBlock(runtime, element) {
     var params = options.data('params');
     var skills = options.data('skills');
 
+    /** Create user */
     var registerUser = function(){
-        // Create user
         $.ajax({
             url: apiBaseUrl + '/course/' + courseId + '/user',
             type: 'POST',
@@ -26,8 +26,8 @@ function EdxAdaptXBlock(runtime, element) {
         });
     };
 
+    /** Configure skill for the user */
     function configureUser() {
-        // Configure skill for the user
         var studentConfig = {
             'course_id': courseId,
             'params': params,
@@ -49,8 +49,8 @@ function EdxAdaptXBlock(runtime, element) {
         });
     };
 
+    /** Check if student already registered in EdxAdapt */
     function registerUserInEdxAdapt() {
-        // Check if student already registered in EdxAdapt
         $.ajax({
             url: apiBaseUrl + '/course/' + courseId + '/user/' + studentId,
             type: 'GET',
