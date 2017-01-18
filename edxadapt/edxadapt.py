@@ -2,7 +2,6 @@ import json
 import logging
 import pkg_resources
 
-from django.template import Template, Context
 from HTMLParser import HTMLParser
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Dict, List, String
@@ -26,15 +25,17 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
     has_author_view = True
 
     display_name = String(
-        default='Adaptive Learning Enrollment',
-        scope=Scope.content,
+        default=_('Adaptive Learning Enrollment'),
+        display_name=_('Display name'),
+        scope=Scope.settings,
+        help=_('XBlock displayed name in the unit content'),
     )
 
     params = Dict(
         default={'pg': 0.25, 'ps': 0.25, 'pi': 0.1, 'pt': 0.5, 'threshold': 0.99},
         display_name=_('BKT params'),
         help=_('Parameters for Bayesian Knowledge Tracing (BKT) model'),
-        scope=Scope.content
+        scope=Scope.settings,
     )
 
     skills = List(
@@ -43,34 +44,30 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
             'd to h', 'histogram', 'None'
         ],
         display_name=_('Course skills list'),
-        scope=Scope.content,
+        scope=Scope.settings,
         help=_(
             'List of skills of this course. Each problem addresses certain skill. '
             'Special skill "None" is used for those problems which belong to none.'
-        )
+        ),
     )
     edx_adapt_api_url = String(
         default='',
         display_name=_('Edx Adapt API base URL'),
-        scope=Scope.content,
-        help=_('Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1')
+        scope=Scope.settings,
+        help=_('Edx Adapt API base URL, e.g. https://edx-adapt.example.com:443/api/v1'),
     )
 
     edx_adapt_course_id = String(
         default='',
         display_name=_('Edx Adapt Course ID'),
-        scope=Scope.content,
+        scope=Scope.settings,
         help=_(
-            "By default Course ID is taken from the Edx e.g. University+Course_name+course_run. E.g. "
-            "Stanford+PS01+2017. In case when adaptive problems are spread between several course's section, Course ID "
-            "should be set manually with adding section name where problems are placed, e.g. "
-            "University+Course_name+course_run:section_name. E.g. Stanford+PS01+2017:introduction"
-        )
-    )
-
-    student_is_registered = Boolean(
-        default=False,
-        scope=Scope.preferences
+            "ID of a course configured on Edx Adapt side. "
+            "By default Course ID is taken from the Edx and follows scheme: <University+Course_name+course_run>. E.g. "
+            "Stanford+PS01+2017. If course contains more than one section with adaptive problems and XBlock is "
+            "included in each section, Course ID must be set manually and include name of a section with adaptive problems. "
+            "It then must follow scheme: <University+Course_name+course_run:section_name>. E.g. Stanford+PS01+2017:introduction"
+        ),
     )
 
     success_registration_msg = String(
@@ -79,7 +76,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         ),
         display_name=_("Successful EdxAdapt registration message"),
         help=_("Message displayed to student after successful registration in EdxAdapt."),
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
     fail_registration_msg = String(
@@ -90,7 +87,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         display_name=_("Failed EdxAdapt registration message"),
         help=_("Assistance message with steps student can do to improve Edx Adapt enrollment, e.g. email could be "
                "added for asking for technical support."),
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
     editable_fields = (
@@ -99,7 +96,7 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         'edx_adapt_api_url',
         'success_registration_msg',
         'fail_registration_msg',
-        'edx_adapt_course_id'
+        'edx_adapt_course_id',
     )
 
     def resource_string(self, path):
