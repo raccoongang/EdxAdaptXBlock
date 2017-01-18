@@ -8,7 +8,7 @@ from xblock.fields import Scope, Boolean, Dict, List, String
 from xblock.fragment import Fragment
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from student.models import anonymous_id_for_user, User
+from student.models import anonymous_id_for_user
 
 
 _ = lambda text: text
@@ -117,11 +117,8 @@ class EdxAdaptXBlock(StudioEditableXBlockMixin, XBlock):
         Returns course non-specific anonymous student id compatible with
         anonymous id used by Capa Problems.
         """
-
-        return anonymous_id_for_user(
-            User.objects.get(
-                id=self.runtime.user_id), None
-        )
+        user = self.system.get_real_user(self.system.anonymous_student_id)
+        return anonymous_id_for_user(user, None, save=False)
 
     def get_course_id(self):
         """
