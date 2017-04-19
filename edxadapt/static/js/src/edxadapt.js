@@ -63,7 +63,7 @@ function EdxAdaptXBlock(runtime, element) {
         .fail(function(jqXHR, textStatus) {
             if (jqXHR.status == 404) {
                 // Student not found in EdxAdapt. Let's register them
-                $.when.apply($, configureUser()).then(registerUser());
+                $.when(configureUser()).then(registerUser());
             }
             console.log("Failed to register student in EdxAdapt", jqXHR.responseText);
         });
